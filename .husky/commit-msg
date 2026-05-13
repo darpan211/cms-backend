@@ -1,0 +1,17 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Validate commit message format
+# Enforce conventional commits: type(scope): subject
+# Examples: feat(auth): add login, fix(api): resolve endpoint issue
+
+commit_msg=$(cat "$1")
+if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci)(\(.+\))?!?: .+'; then
+  echo "❌ Invalid commit message format!"
+  echo "Expected format: type(scope): subject"
+  echo "Examples:"
+  echo "  feat(auth): add login functionality"
+  echo "  fix(api): resolve endpoint issue"
+  echo "  docs: update README"
+  exit 1
+fi
