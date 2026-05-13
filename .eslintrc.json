@@ -17,6 +17,7 @@
     "es2022": true
   },
   "rules": {
+    "@typescript-eslint/consistent-type-imports": "error",
     "no-console": "warn",
     "no-unused-vars": "off",
     "@typescript-eslint/explicit-function-return-type": "off",

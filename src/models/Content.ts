@@ -1,0 +1,76 @@
+import mongoose, { Document, Schema } from 'mongoose';
+
+export interface IVideo {
+  title: string;
+  s3Key: string;
+  duration: number;
+  order: number;
+  _id?: mongoose.Types.ObjectId;
+}
+
+export interface IContent extends Document {
+  categoryId: mongoose.Types.ObjectId;
+  title: string;
+  description?: string;
+  thumbnailUrl?: string;
+  videos: IVideo[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const videoSchema = new Schema<IVideo>(
+  {
+    title: {
+      type: String,
+      required: true,
+      maxlength: 200,
+    },
+    s3Key: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    duration: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    order: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+  },
+  { _id: true },
+);
+
+const contentSchema = new Schema<IContent>(
+  {
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Category',
+      index: true,
+    },
+    title: {
+      type: String,
+      required: true,
+      maxlength: 200,
+      index: true,
+    },
+    description: {
+      type: String,
+      default: null,
+    },
+    thumbnailUrl: {
+      type: String,
+      default: null,
+    },
+    videos: [videoSchema],
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export const Content = mongoose.model<IContent>('Content', contentSchema);
