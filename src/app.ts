@@ -53,7 +53,6 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/series', seriesRoutes);
-app.use('/api/admin/series', seriesRoutes);
 
 // 404 Handler
 app.use((_req: Request, res: Response) => {

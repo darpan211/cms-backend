@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware, adminMiddleware } from '../middlewares/auth.js';
+import { authMiddleware, superadminMiddleware } from '../middlewares/auth.js';
 import {
   getCategories,
   getCategoryById,
@@ -14,9 +14,9 @@ const router = Router();
 router.get('/', getCategories);
 router.get('/:id', getCategoryById);
 
-// Admin routes
-router.post('/', authMiddleware, adminMiddleware, createCategory);
-router.patch('/:id', authMiddleware, adminMiddleware, updateCategory);
-router.delete('/:id', authMiddleware, adminMiddleware, deleteCategory);
+// Superadmin routes
+router.post('/', authMiddleware, superadminMiddleware, createCategory);
+router.patch('/:id', authMiddleware, superadminMiddleware, updateCategory);
+router.delete('/:id', authMiddleware, superadminMiddleware, deleteCategory);
 
 export default router;

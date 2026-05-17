@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware, adminMiddleware } from '../middlewares/auth.js';
+import { authMiddleware, superadminMiddleware } from '../middlewares/auth.js';
 import {
   generateUploadUrl,
   createSeries,
@@ -13,10 +13,10 @@ const router = Router();
 // Public routes
 router.get('/:id', getSeriesById);
 
-// Admin routes
-router.post('/generate-upload-url', authMiddleware, adminMiddleware, generateUploadUrl);
-router.post('/', authMiddleware, adminMiddleware, createSeries);
-router.patch('/:id', authMiddleware, adminMiddleware, updateSeries);
-router.delete('/:id', authMiddleware, adminMiddleware, deleteSeries);
+// Superadmin routes
+router.post('/generate-upload-url', authMiddleware, superadminMiddleware, generateUploadUrl);
+router.post('/', authMiddleware, superadminMiddleware, createSeries);
+router.patch('/:id', authMiddleware, superadminMiddleware, updateSeries);
+router.delete('/:id', authMiddleware, superadminMiddleware, deleteSeries);
 
 export default router;

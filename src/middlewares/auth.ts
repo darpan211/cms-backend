@@ -5,6 +5,7 @@ import { AppError } from '../utils/errors.js';
 import { ROLES, ERROR_MESSAGES } from '../constants/index.js';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: JWTPayload;
@@ -32,9 +33,9 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
   }
 };
 
-export const adminMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  if (req.user?.role !== ROLES.ADMIN) {
-    res.status(403).json({ error: ERROR_MESSAGES.ADMIN_ONLY });
+export const superadminMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  if (req.user?.role !== ROLES.SUPERADMIN) {
+    res.status(403).json({ error: ERROR_MESSAGES.SUPERADMIN_ONLY });
     return;
   }
   next();

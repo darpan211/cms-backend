@@ -8,10 +8,10 @@ import { ERROR_MESSAGES } from '../constants/index.js';
 
 /**
  * @swagger
- * /api/admin/series/generate-upload-url:
+ * /api/series/generate-upload-url:
  *   post:
  *     summary: Generate presigned S3 upload URL
- *     description: Generate a presigned POST URL for client-side S3 upload (admin only)
+ *     description: Generate a presigned POST URL for client-side S3 upload (superadmin only)
  *     tags:
  *       - Series
  *     security:
@@ -48,26 +48,28 @@ import { ERROR_MESSAGES } from '../constants/index.js';
  *       400:
  *         description: Validation error
  */
-export const generateUploadUrl = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-  const validationResult = GenerateUploadUrlSchema.safeParse(req.body);
+export const generateUploadUrl = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const validationResult = GenerateUploadUrlSchema.safeParse(req.body);
 
-  if (!validationResult.success) {
-    const errorMessage = validationResult.error.issues[0]?.message || 'Validation failed';
-    throw new AppError(400, errorMessage);
-  }
+    if (!validationResult.success) {
+      const errorMessage = validationResult.error.issues[0]?.message || 'Validation failed';
+      throw new AppError(400, errorMessage);
+    }
 
-  const { fileName, fileType } = validationResult.data;
-  const uploadData = await S3Service.generateUploadUrl(fileName, fileType);
+    const { fileName, fileType } = validationResult.data;
+    const uploadData = await S3Service.generateUploadUrl(fileName, fileType);
 
-  res.status(200).json(uploadData);
-});
+    res.status(200).json(uploadData);
+  },
+);
 
 /**
  * @swagger
- * /api/admin/series:
+ * /api/series:
  *   post:
  *     summary: Create a new series
- *     description: Create a new series and save video metadata (admin only)
+ *     description: Create a new series and save video metadata (superadmin only)
  *     tags:
  *       - Series
  *     security:
@@ -167,10 +169,10 @@ export const getSeriesById = asyncHandler(async (req: Request, res: Response): P
 
 /**
  * @swagger
- * /api/admin/series/{id}:
+ * /api/series/{id}:
  *   patch:
  *     summary: Update series
- *     description: Update series details and videos (admin only)
+ *     description: Update series details and videos (superadmin only)
  *     tags:
  *       - Series
  *     security:
@@ -228,10 +230,10 @@ export const updateSeries = asyncHandler(async (req: Request, res: Response): Pr
 
 /**
  * @swagger
- * /api/admin/series/{id}:
+ * /api/series/{id}:
  *   delete:
  *     summary: Delete series
- *     description: Delete a series (admin only)
+ *     description: Delete a series (superadmin only)
  *     tags:
  *       - Series
  *     security:

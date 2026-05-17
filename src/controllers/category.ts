@@ -60,10 +60,10 @@ export const getCategoryById = asyncHandler(async (req: Request, res: Response):
 
 /**
  * @swagger
- * /api/admin/categories:
+ * /api/categories:
  *   post:
  *     summary: Create a new category
- *     description: Create a new category (admin only)
+ *     description: Create a new category (superadmin only)
  *     tags:
  *       - Categories
  *     security:
@@ -112,10 +112,10 @@ export const createCategory = asyncHandler(async (req: Request, res: Response): 
 
 /**
  * @swagger
- * /api/admin/categories/{id}:
+ * /api/categories/{id}:
  *   patch:
  *     summary: Update a category
- *     description: Update category details (admin only)
+ *     description: Update category details (superadmin only)
  *     tags:
  *       - Categories
  *     security:
@@ -173,10 +173,10 @@ export const updateCategory = asyncHandler(async (req: Request, res: Response): 
 
 /**
  * @swagger
- * /api/admin/categories/{id}:
+ * /api/categories/{id}:
  *   delete:
  *     summary: Delete a category
- *     description: Delete a category (admin only)
+ *     description: Delete a category (superadmin only)
  *     tags:
  *       - Categories
  *     security:

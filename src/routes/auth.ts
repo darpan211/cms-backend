@@ -1,11 +1,19 @@
 import { Router } from 'express';
-import { userLogin, adminLogin, createSuperadmin } from '../controllers/auth.js';
-// import { authMiddleware, adminMiddleware } from '../middlewares/auth.js';
+import {
+  userRegister,
+  userLogin,
+  superadminRegister,
+  superadminLogin,
+} from '../controllers/auth.js';
 
 const router = Router();
 
+// Normal user
+router.post('/register', userRegister);
 router.post('/login', userLogin);
-router.post('/admin-login', adminLogin);
-router.post('/create-superadmin', createSuperadmin);
+
+// Superadmin
+router.post('/superadmin/register', superadminRegister);
+router.post('/superadmin/login', superadminLogin);
 
 export default router;

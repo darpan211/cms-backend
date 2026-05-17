@@ -6,15 +6,17 @@ export const JWT_EXPIRY = process.env['JWT_EXPIRY'] || '7d';
 export const S3_BUCKET = process.env['S3_BUCKET'] || 'cms-videos';
 
 export const ROLES = {
-  ADMIN: 'admin',
+  SUPERADMIN: 'superadmin',
   USER: 'user',
 } as const;
 
 export const ERROR_MESSAGES = {
-  INVALID_CREDENTIALS: 'Invalid mobile number or password',
+  INVALID_CREDENTIALS: 'Invalid credentials',
   UNAUTHORIZED: 'Unauthorized access',
-  ADMIN_ONLY: 'Admin access required',
+  SUPERADMIN_ONLY: 'Superadmin access required',
   NOT_FOUND: 'Resource not found',
   DUPLICATE_ENTRY: 'Duplicate entry',
   INVALID_FILE: 'Invalid file type or size',
+  USER_EXISTS: 'User with this mobile number already exists',
+  SUPERADMIN_EXISTS: 'Superadmin with this email already exists',
 } as const;

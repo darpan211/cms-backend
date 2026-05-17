@@ -34,7 +34,7 @@ const options: swaggerJSDoc.Options = {
       },
       {
         name: 'Authentication',
-        description: 'User and admin authentication',
+        description: 'User and superadmin authentication',
       },
       {
         name: 'Categories',
@@ -46,11 +46,7 @@ const options: swaggerJSDoc.Options = {
       },
     ],
   },
-  apis: [
-    './src/app.ts',
-    './src/routes/*.ts',
-    './src/controllers/*.ts',
-  ],
+  apis: ['./src/app.ts', './src/routes/*.ts', './src/controllers/*.ts'],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
