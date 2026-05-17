@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { User } from '../models/User.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppError, asyncHandler } from '../utils/errors.js';
-import { UserLoginSchema, AdminLoginSchema } from '../schemas/validation.js';
+import { UserLoginSchema, AdminLoginSchema, CreateSuperadminSchema } from '../schemas/validation.js';
 import { ROLES, ERROR_MESSAGES } from '../constants/index.js';
 
 /**
@@ -127,6 +127,67 @@ export const adminLogin = asyncHandler(async (req: Request, res: Response): Prom
       id: foundUser._id,
       mobileNumber: foundUser.mobileNumber,
       role: foundUser.role,
+    },
+  });
+});
+
+/**
+ * @swagger
+ * /api/auth/create-superadmin:
+ *   post:
+ *     summary: Create a superadmin user
+ *     description: Create a new superadmin account (admin only)
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mobileNumber:
+ *                 type: string
+ *                 example: "9876543210"
+ *     responses:
+ *       201:
+ *         description: Superadmin created successfully
+ *       400:
+ *         description: Validation error
+ *       409:
+ *         description: User already exists
+ *       403:
+ *         description: Admin access required
+ */
+export const createSuperadmin = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const validationResult = CreateSuperadminSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    const errorMessage = validationResult.error.issues[0]?.message || 'Validation failed';
+    throw new AppError(400, errorMessage);
+  }
+
+  const { mobileNumber } = validationResult.data;
+
+  const existingUser = await User.findOne({ mobileNumber });
+
+  if (existingUser) {
+    throw new AppError(409, ERROR_MESSAGES.DUPLICATE_ENTRY);
+  }
+
+  const superadmin = await User.create({
+    mobileNumber,
+    role: ROLES.ADMIN,
+  });
+
+  res.status(201).json({
+    message: 'Superadmin created successfully',
+    user: {
+      id: superadmin._id,
+      mobileNumber: superadmin.mobileNumber,
+      role: superadmin.role,
     },
   });
 });

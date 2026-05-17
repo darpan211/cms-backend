@@ -16,6 +16,14 @@ export const AdminLoginSchema = z.object({
     .regex(/^\d+$/, 'Mobile number must contain only digits'),
 });
 
+export const CreateSuperadminSchema = z.object({
+  mobileNumber: z
+    .string()
+    .min(10, 'Mobile number must be at least 10 digits')
+    .max(15, 'Mobile number must not exceed 15 digits')
+    .regex(/^\d+$/, 'Mobile number must contain only digits'),
+});
+
 export const CategorySchema = z.object({
   name: z
     .string()
@@ -75,6 +83,7 @@ export const GenerateUploadUrlSchema = z.object({
 
 export type UserLogin = z.infer<typeof UserLoginSchema>;
 export type AdminLogin = z.infer<typeof AdminLoginSchema>;
+export type CreateSuperadmin = z.infer<typeof CreateSuperadminSchema>;
 export type Category = z.infer<typeof CategorySchema>;
 export type Video = z.infer<typeof VideoSchema>;
 export type Series = z.infer<typeof SeriesSchema>;

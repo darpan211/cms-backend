@@ -15,7 +15,6 @@ declare global {
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader?.startsWith('Bearer ')) {
       throw new AppError(401, ERROR_MESSAGES.UNAUTHORIZED);
     }
