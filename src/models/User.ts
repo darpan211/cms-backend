@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { ROLES } from '../constants/index.js';
 
 export interface IUser extends Document {
-  mobileNumber?: string;
+  mobileNumber?: string | null;
   email?: string;
   password: string;
   role: 'superadmin' | 'user';
@@ -21,6 +21,10 @@ const userSchema = new Schema<IUser>(
       sparse: true,
       index: true,
       match: /^\d{10,15}$/,
+      required: function (this: IUser) {
+        // Enforced if the user's role is 'user' (or anything that isn't superadmin)
+        return this.role === ROLES.USER;
+      },
     },
     email: {
       type: String,

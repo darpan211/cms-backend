@@ -1,5 +1,6 @@
 import express, { type Application, type Request, type Response } from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
@@ -14,8 +15,40 @@ dotenv.config();
 const app: Application = express();
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
 app.use(express.json());
+
+// Rate Limiters — disabled in development so they don't block debugging
+const isDev = process.env['NODE_ENV'] !== 'production';
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isDev,
+  message: { error: 'Too many requests, please try again later.' },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isDev,
+  message: { error: 'Too many authentication attempts, please try again later.' },
+});
+
+// Auth limiter must run BEFORE global limiter for /api/auth paths
+app.use('/api/auth', authLimiter, authRoutes);
+app.use(globalLimiter);
 
 // Database Connection
 connectDatabase();
@@ -50,7 +83,7 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', );
 app.use('/api/categories', categoryRoutes);
 app.use('/api/series', seriesRoutes);
 

@@ -15,7 +15,8 @@ export const errorHandler = (
     return;
   }
 
-  console.error('Unexpected error:', err);
+  // eslint-disable-next-line no-console
+  console.warn('Unexpected error:', err);
   res.status(500).json({
     error: 'Internal server error',
     statusCode: 500,
