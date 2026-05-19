@@ -1,4 +1,4 @@
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { DeleteObjectsCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import s3Client from '../config/aws.js';
 import { S3_BUCKET, UPLOAD_URL_EXPIRY, STREAM_URL_EXPIRY } from '../constants/index.js';
@@ -46,6 +46,25 @@ export class S3Service {
     });
 
     return signedUrl;
+  }
+
+  /**
+   * Delete multiple objects from S3 in a single batch request.
+   * @param keys - Array of S3 object keys to delete
+   */
+  static async deleteObjects(keys: string[]): Promise<void> {
+    const filtered = keys.filter((k): k is string => Boolean(k));
+    if (filtered.length === 0) return;
+
+    const command = new DeleteObjectsCommand({
+      Bucket: S3_BUCKET,
+      Delete: {
+        Objects: filtered.map((Key) => ({ Key })),
+        Quiet: true,
+      },
+    });
+
+    await s3Client.send(command);
   }
 
   /**

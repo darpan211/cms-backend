@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express, { type Application, type Request, type Response } from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
 import { connectDatabase } from './config/database.js';
@@ -9,8 +9,6 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/auth.js';
 import categoryRoutes from './routes/categories.js';
 import seriesRoutes from './routes/series.js';
-
-dotenv.config();
 
 const app: Application = express();
 

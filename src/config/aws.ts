@@ -1,10 +1,21 @@
 import { S3Client } from '@aws-sdk/client-s3';
 
+const endpoint = process.env['DO_SPACES_ENDPOINT'];
+const region = process.env['DO_SPACES_REGION'] || 'us-east-1';
+const accessKeyId = process.env['DO_SPACES_KEY'] || '';
+const secretAccessKey = process.env['DO_SPACES_SECRET'] || '';
+
+if (!accessKeyId || !secretAccessKey) {
+  console.warn('[aws] Missing DO_SPACES_KEY/SECRET — S3 client will fail on requests.');
+}
+
 const s3Client = new S3Client({
-  region: process.env['AWS_REGION'] || 'us-east-1',
+  ...(endpoint && { endpoint }),
+  forcePathStyle: false,
+  region: region,
   credentials: {
-    accessKeyId: process.env['AWS_ACCESS_KEY_ID'] || '',
-    secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'] || '',
+    accessKeyId: accessKeyId,
+    secretAccessKey: secretAccessKey,
   },
 });
 

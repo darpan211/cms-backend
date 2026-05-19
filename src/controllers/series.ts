@@ -302,11 +302,21 @@ export const updateSeries = asyncHandler(async (req: Request, res: Response): Pr
  *         description: Series not found
  */
 export const deleteSeries = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-  const series = await Content.findByIdAndDelete(req.params['id']);
+  const series = await Content.findById(req.params['id']);
 
   if (!series) {
     throw new AppError(404, ERROR_MESSAGES.NOT_FOUND);
   }
+
+  const keys: string[] = [];
+  if (series.thumbnailUrl) keys.push(series.thumbnailUrl);
+  for (const video of series.videos) {
+    if (video.s3Key) keys.push(video.s3Key);
+    if (video.thumbnailUrl) keys.push(video.thumbnailUrl);
+  }
+
+  await S3Service.deleteObjects(keys);
+  await series.deleteOne();
 
   res.status(200).json({ message: 'Series deleted successfully' });
 });
