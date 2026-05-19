@@ -133,12 +133,17 @@ export const createSeries = asyncHandler(async (req: Request, res: Response): Pr
     throw new AppError(404, ERROR_MESSAGES.NOT_FOUND);
   }
 
+  if (!req.user) {
+    throw new AppError(401, ERROR_MESSAGES.UNAUTHORIZED);
+  }
+
   const series = await Content.create({
     categoryId: categoryId as any,
     title,
     ...(description && { description }),
     ...(thumbnailUrl && { thumbnailUrl }),
     videos: normalizeVideos(videos || []),
+    createdBy: req.user.userId,
   });
 
   res.status(201).json(series);

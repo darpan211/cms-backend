@@ -5,6 +5,7 @@ export interface ICategory extends Document {
   name: string;
   slug: string;
   thumbnailUrl?: string;
+  createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,12 @@ const categorySchema = new Schema<ICategory>(
     thumbnailUrl: {
       type: String,
       default: null,
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
     },
   },
   {

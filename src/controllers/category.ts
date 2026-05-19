@@ -101,10 +101,15 @@ export const createCategory = asyncHandler(async (req: Request, res: Response): 
     throw new AppError(409, ERROR_MESSAGES.DUPLICATE_ENTRY);
   }
 
+  if (!req.user) {
+    throw new AppError(401, ERROR_MESSAGES.UNAUTHORIZED);
+  }
+
   const category = await Category.create({
     name,
     slug,
     ...(thumbnailUrl && { thumbnailUrl }),
+    createdBy: req.user.userId,
   });
 
   res.status(201).json(category);

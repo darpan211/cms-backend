@@ -16,6 +16,7 @@ export interface IContent extends Document {
   description?: string;
   thumbnailUrl?: string;
   videos: IVideo[];
+  createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +74,12 @@ const contentSchema = new Schema<IContent>(
       default: null,
     },
     videos: [videoSchema],
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
