@@ -6,6 +6,23 @@ import { AppError, asyncHandler } from '../utils/errors.js';
 import { GenerateUploadUrlSchema, SeriesSchema } from '../schemas/validation.js';
 import { ERROR_MESSAGES } from '../constants/index.js';
 
+type VideoInput = {
+  title: string;
+  s3Key: string;
+  duration: number;
+  order: number;
+  thumbnailUrl?: string | undefined;
+};
+
+const normalizeVideos = (videos: VideoInput[]) =>
+  videos.map((v) => ({
+    title: v.title,
+    s3Key: v.s3Key,
+    duration: v.duration,
+    order: v.order,
+    thumbnailUrl: v.thumbnailUrl ?? null,
+  }));
+
 /**
  * @swagger
  * /api/series/generate-upload-url:
@@ -121,10 +138,44 @@ export const createSeries = asyncHandler(async (req: Request, res: Response): Pr
     title,
     ...(description && { description }),
     ...(thumbnailUrl && { thumbnailUrl }),
-    videos: videos || [],
+    videos: normalizeVideos(videos || []),
   });
 
   res.status(201).json(series);
+});
+
+/**
+ * @swagger
+ * /api/series:
+ *   get:
+ *     summary: Get all series
+ *     description: Fetch all series, optionally filtered by category (public endpoint)
+ *     tags:
+ *       - Series
+ *     parameters:
+ *       - name: categoryId
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of series
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ */
+export const getAllSeries = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const categoryId =
+    typeof req.query['categoryId'] === 'string' ? req.query['categoryId'] : undefined;
+  const filter = categoryId ? { categoryId } : {};
+
+  const series = await Content.find(filter).populate('categoryId').sort({ createdAt: -1 });
+
+  res.status(200).json(series);
 });
 
 /**
@@ -222,7 +273,7 @@ export const updateSeries = asyncHandler(async (req: Request, res: Response): Pr
   if (title) series.title = title;
   if (description) series.description = description;
   if (thumbnailUrl) series.thumbnailUrl = thumbnailUrl;
-  if (videos) series.videos = videos;
+  if (videos) series.videos = normalizeVideos(videos);
 
   await series.save();
   res.status(200).json(series);

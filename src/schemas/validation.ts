@@ -52,6 +52,7 @@ export const VideoSchema = z.object({
   s3Key: z.string().min(1, 'S3 key is required'),
   duration: z.number().positive('Duration must be positive'),
   order: z.number().nonnegative('Order must be non-negative'),
+  thumbnailUrl: z.string().min(1, 'Thumbnail key is required').optional(),
 });
 
 export const SeriesSchema = z.object({
@@ -61,7 +62,7 @@ export const SeriesSchema = z.object({
     .min(1, 'Series title is required')
     .max(200, 'Series title must not exceed 200 characters'),
   description: z.string().optional(),
-  thumbnailUrl: z.url('Invalid thumbnail URL').optional(),
+  thumbnailUrl: z.string().min(1, 'Thumbnail key is required').optional(),
   videos: z.array(VideoSchema).optional().default([]),
 });
 

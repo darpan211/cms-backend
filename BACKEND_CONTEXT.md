@@ -158,13 +158,14 @@ Body:
       "title": "Episode 1",
       "s3Key": "videos/<uuid>.mp4",
       "duration": 1234,
-      "order": 0
+      "order": 0,
+      "thumbnailUrl": "https://... (optional, valid URL)"
     }
   ]
 }
 ```
 - `title`: 1–200 chars
-- Each video: `title` (1–200), `s3Key`, `duration` (positive number), `order` (>= 0)
+- Each video: `title` (1–200), `s3Key`, `duration` (positive number), `order` (>= 0), `thumbnailUrl` (optional, valid URL — each video may have its own thumbnail independent of the series thumbnail)
 
 Success `201`: created series. Errors: `400` validation, `404` category not found.
 
@@ -185,6 +186,7 @@ Response `200`:
       "s3Key": "videos/...",
       "duration": 1234,
       "order": 0,
+      "thumbnailUrl": "https://... | null",
       "streamUrl": "https://s3-presigned... (expires in 1h)"
     }
   ],
@@ -248,6 +250,7 @@ export interface Video {
   s3Key: string;
   duration: number;
   order: number;
+  thumbnailUrl?: string | null; // optional per-video thumbnail
   streamUrl?: string; // only present on GET /api/series/:id
 }
 

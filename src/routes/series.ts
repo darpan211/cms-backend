@@ -3,6 +3,7 @@ import { authMiddleware, superadminMiddleware } from '../middlewares/auth.js';
 import {
   generateUploadUrl,
   createSeries,
+  getAllSeries,
   getSeriesById,
   updateSeries,
   deleteSeries,
@@ -11,6 +12,7 @@ import {
 const router = Router();
 
 // Public routes
+router.get('/', getAllSeries);
 router.get('/:id', getSeriesById);
 
 // Superadmin routes

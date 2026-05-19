@@ -6,6 +6,7 @@ export interface IVideo {
   s3Key: string;
   duration: number;
   order: number;
+  thumbnailUrl?: string | null;
   _id?: mongoose.Types.ObjectId;
 }
 
@@ -40,6 +41,10 @@ const videoSchema = new Schema<IVideo>(
       type: Number,
       required: true,
       min: 0,
+    },
+    thumbnailUrl: {
+      type: String,
+      default: null,
     },
   },
   { _id: true },

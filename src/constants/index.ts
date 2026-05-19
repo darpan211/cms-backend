@@ -4,6 +4,7 @@ export const STREAM_URL_EXPIRY = 3600; // 1 hour
 export const JWT_SECRET = process.env['JWT_SECRET'] || 'your-secret-key-change-in-production';
 export const JWT_EXPIRY = process.env['JWT_EXPIRY'] || '7d';
 export const S3_BUCKET = process.env['S3_BUCKET'] || 'cms-videos';
+export const DO_SPACES_CDN = process.env['DO_SPACES_CDN'] || '';
 
 export const ROLES = {
   SUPERADMIN: 'superadmin',
