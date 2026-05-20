@@ -31,7 +31,7 @@ const categorySchema = new Schema<ICategory>(
     },
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Superadmin',
       required: true,
       index: true,
     },

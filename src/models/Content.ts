@@ -76,7 +76,7 @@ const contentSchema = new Schema<IContent>(
     videos: [videoSchema],
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Superadmin',
       required: true,
       index: true,
     },

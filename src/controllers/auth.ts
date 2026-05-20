@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { User } from '../models/User.js';
+import { Superadmin } from '../models/Superadmin.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppError, asyncHandler } from '../utils/errors.js';
 import {
@@ -8,7 +9,7 @@ import {
   SuperadminRegisterSchema,
   SuperadminLoginSchema,
 } from '../schemas/validation.js';
-import { ROLES, ERROR_MESSAGES } from '../constants/index.js';
+import { ERROR_MESSAGES } from '../constants/index.js';
 
 /**
  * @swagger
@@ -55,13 +56,12 @@ export const userRegister = asyncHandler(async (req: Request, res: Response): Pr
   const user = await User.create({
     mobileNumber,
     password,
-    role: ROLES.USER,
   });
 
   const token = generateToken({
     userId: user._id.toString(),
     role: user.role,
-    ...(user.mobileNumber ? { mobileNumber: user.mobileNumber } : {}),
+    mobileNumber: user.mobileNumber,
   });
 
   res.status(201).json({
@@ -111,7 +111,7 @@ export const userLogin = asyncHandler(async (req: Request, res: Response): Promi
 
   const { mobileNumber, password } = parsed.data;
 
-  const user = await User.findOne({ mobileNumber, role: ROLES.USER }).select('+password');
+  const user = await User.findOne({ mobileNumber }).select('+password');
   if (!user) {
     throw new AppError(401, ERROR_MESSAGES.INVALID_CREDENTIALS);
   }
@@ -124,7 +124,7 @@ export const userLogin = asyncHandler(async (req: Request, res: Response): Promi
   const token = generateToken({
     userId: user._id.toString(),
     role: user.role,
-    ...(user.mobileNumber ? { mobileNumber: user.mobileNumber } : {}),
+    mobileNumber: user.mobileNumber,
   });
 
   res.status(200).json({
@@ -175,21 +175,20 @@ export const superadminRegister = asyncHandler(
 
     const { email, password } = parsed.data;
 
-    const existingByEmail = await User.findOne({ email });
+    const existingByEmail = await Superadmin.findOne({ email });
     if (existingByEmail) {
       throw new AppError(409, ERROR_MESSAGES.SUPERADMIN_EXISTS);
     }
 
-    const superadmin = await User.create({
+    const superadmin = await Superadmin.create({
       email,
       password,
-      role: ROLES.SUPERADMIN,
     });
 
     const token = generateToken({
       userId: superadmin._id.toString(),
       role: superadmin.role,
-      ...(superadmin.email ? { email: superadmin.email } : {}),
+      email: superadmin.email,
     });
 
     res.status(201).json({
@@ -240,7 +239,7 @@ export const superadminLogin = asyncHandler(async (req: Request, res: Response):
 
   const { email, password } = parsed.data;
 
-  const superadmin = await User.findOne({ email, role: ROLES.SUPERADMIN }).select('+password');
+  const superadmin = await Superadmin.findOne({ email }).select('+password');
   if (!superadmin) {
     throw new AppError(401, ERROR_MESSAGES.INVALID_CREDENTIALS);
   }
@@ -253,7 +252,7 @@ export const superadminLogin = asyncHandler(async (req: Request, res: Response):
   const token = generateToken({
     userId: superadmin._id.toString(),
     role: superadmin.role,
-    ...(superadmin.email ? { email: superadmin.email } : {}),
+    email: superadmin.email,
   });
 
   res.status(200).json({

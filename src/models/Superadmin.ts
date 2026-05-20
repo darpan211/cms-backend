@@ -3,23 +3,25 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { ROLES } from '../constants/index.js';
 
-export interface IUser extends Document {
-  mobileNumber: string;
+export interface ISuperadmin extends Document {
+  email: string;
   password: string;
-  role: 'user';
+  role: 'superadmin';
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUser>(
+const superadminSchema = new Schema<ISuperadmin>(
   {
-    mobileNumber: {
+    email: {
       type: String,
       required: true,
       unique: true,
       index: true,
-      match: /^\d{10,15}$/,
+      lowercase: true,
+      trim: true,
+      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
     password: {
       type: String,
@@ -28,8 +30,8 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: [ROLES.USER],
-      default: ROLES.USER,
+      enum: [ROLES.SUPERADMIN],
+      default: ROLES.SUPERADMIN,
       required: true,
     },
   },
@@ -38,17 +40,17 @@ const userSchema = new Schema<IUser>(
   },
 );
 
-userSchema.pre('save', async function (this: IUser): Promise<void> {
+superadminSchema.pre('save', async function (this: ISuperadmin): Promise<void> {
   if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-userSchema.methods['comparePassword'] = async function (
-  this: IUser,
+superadminSchema.methods['comparePassword'] = async function (
+  this: ISuperadmin,
   candidate: string,
 ): Promise<boolean> {
   return bcrypt.compare(candidate, this.password);
 };
 
-export const User = mongoose.model<IUser>('User', userSchema);
+export const Superadmin = mongoose.model<ISuperadmin>('Superadmin', superadminSchema);
