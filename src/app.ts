@@ -9,18 +9,25 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/auth.js';
 import categoryRoutes from './routes/categories.js';
 import seriesRoutes from './routes/series.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
 
 const app: Application = express();
 
 // Middlewares
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
+
+// Razorpay webhooks need the raw request bytes for HMAC verification, so the
+// raw parser must be mounted on this route BEFORE the global express.json().
+app.use('/api/webhooks/razorpay', express.raw({ type: 'application/json' }), webhookRoutes);
+
 app.use(express.json());
 
 // Rate Limiters — disabled in development so they don't block debugging
@@ -84,6 +91,7 @@ app.get('/health', (_req: Request, res: Response) => {
 // app.use('/api/auth', );
 app.use('/api/categories', categoryRoutes);
 app.use('/api/series', seriesRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 404 Handler
 app.use((_req: Request, res: Response) => {

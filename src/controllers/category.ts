@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { Category } from '../models/Category.js';
+import { S3Service } from '../services/s3.js';
 import { generateSlug } from '../utils/slug.js';
 import { AppError, asyncHandler } from '../utils/errors.js';
 import { CategorySchema } from '../schemas/validation.js';
@@ -27,6 +28,88 @@ export const getCategories = asyncHandler(async (_req: Request, res: Response): 
   const categories = await Category.find().sort({ createdAt: -1 });
   res.status(200).json(categories);
 });
+
+/**
+ * @swagger
+ * /api/categories/home:
+ *   get:
+ *     summary: Get homepage feed — categories with content thumbnails
+ *     description: Public endpoint. Returns the 7 most recent categories, each with up to 10 presigned thumbnail URLs sourced from that category's most recent Content documents.
+ *     tags:
+ *       - Categories
+ *     responses:
+ *       200:
+ *         description: List of categories with thumbnail URL lists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   thumbnails:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ */
+export const getCategoriesHome = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    const CATEGORY_LIMIT = 7;
+    const THUMBNAILS_PER_CATEGORY = 10;
+
+    const rows = await Category.aggregate<{
+      _id: unknown;
+      name: string;
+      thumbnailKeys: string[];
+    }>([
+      { $sort: { createdAt: -1 } },
+      { $limit: CATEGORY_LIMIT },
+      {
+        $lookup: {
+          from: 'contents',
+          let: { categoryId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$categoryId', '$$categoryId'] },
+                thumbnailUrl: { $type: 'string', $ne: '' },
+              },
+            },
+            { $sort: { createdAt: -1 } },
+            { $limit: THUMBNAILS_PER_CATEGORY },
+            { $project: { _id: 0, thumbnailUrl: 1 } },
+          ],
+          as: 'contents',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          thumbnailKeys: {
+            $map: { input: '$contents', as: 'c', in: '$$c.thumbnailUrl' },
+          },
+        },
+      },
+    ]);
+
+    const result = await Promise.all(
+      rows.map(async (row) => ({
+        _id: row._id,
+        name: row.name,
+        thumbnails: await Promise.all(
+          row.thumbnailKeys.map((key) => S3Service.generateStreamUrl(key)),
+        ),
+      })),
+    );
+
+    res.status(200).json(result);
+  },
+);
 
 /**
  * @swagger

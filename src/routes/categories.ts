@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authMiddleware, superadminMiddleware } from '../middlewares/auth.js';
 import {
   getCategories,
+  getCategoriesHome,
   getCategoryById,
   createCategory,
   updateCategory,
@@ -10,8 +11,9 @@ import {
 
 const router = Router();
 
-// Public routes
+// Public routes — /home must come BEFORE /:id so it isn't matched as an id.
 router.get('/', getCategories);
+router.get('/home', getCategoriesHome);
 router.get('/:id', getCategoryById);
 
 // Superadmin routes

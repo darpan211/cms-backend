@@ -7,6 +7,7 @@ export interface IVideo {
   duration: number;
   order: number;
   thumbnailUrl?: string | null;
+  isPremium: boolean;
   _id?: mongoose.Types.ObjectId;
 }
 
@@ -46,6 +47,11 @@ const videoSchema = new Schema<IVideo>(
     thumbnailUrl: {
       type: String,
       default: null,
+    },
+    isPremium: {
+      type: Boolean,
+      default: true,
+      required: true,
     },
   },
   { _id: true },

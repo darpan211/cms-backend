@@ -12,6 +12,7 @@ type VideoInput = {
   duration: number;
   order: number;
   thumbnailUrl?: string | undefined;
+  isPremium?: boolean | undefined;
 };
 
 const normalizeVideos = (videos: VideoInput[]) =>
@@ -21,6 +22,7 @@ const normalizeVideos = (videos: VideoInput[]) =>
     duration: v.duration,
     order: v.order,
     thumbnailUrl: v.thumbnailUrl ?? null,
+    isPremium: v.isPremium ?? true,
   }));
 
 /**

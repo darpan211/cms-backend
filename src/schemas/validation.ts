@@ -53,6 +53,7 @@ export const VideoSchema = z.object({
   duration: z.number().positive('Duration must be positive'),
   order: z.number().nonnegative('Order must be non-negative'),
   thumbnailUrl: z.string().min(1, 'Thumbnail key is required').optional(),
+  isPremium: z.boolean().optional(),
 });
 
 export const SeriesSchema = z.object({
@@ -71,6 +72,12 @@ export const GenerateUploadUrlSchema = z.object({
   fileType: z.string().regex(/^video\//, 'File type must be a video type'),
 });
 
+export const SubscribeSchema = z.object({});
+
+export const CancelSubscriptionSchema = z.object({
+  razorpaySubscriptionId: z.string().min(1, 'razorpaySubscriptionId is required'),
+});
+
 export type UserRegister = z.infer<typeof UserRegisterSchema>;
 export type UserLogin = z.infer<typeof UserLoginSchema>;
 export type SuperadminRegister = z.infer<typeof SuperadminRegisterSchema>;
@@ -79,3 +86,5 @@ export type Category = z.infer<typeof CategorySchema>;
 export type Video = z.infer<typeof VideoSchema>;
 export type Series = z.infer<typeof SeriesSchema>;
 export type GenerateUploadUrl = z.infer<typeof GenerateUploadUrlSchema>;
+export type Subscribe = z.infer<typeof SubscribeSchema>;
+export type CancelSubscription = z.infer<typeof CancelSubscriptionSchema>;
